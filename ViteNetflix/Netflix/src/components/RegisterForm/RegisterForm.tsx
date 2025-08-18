@@ -1,15 +1,22 @@
-import React from "react";
 import { useForm, Controller } from "react-hook-form";
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
 import { Button } from "primereact/button";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useNavigate } from "react-router-dom"; // ✅ для редіректу
 
 import "primereact/resources/themes/saga-blue/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import "./RegisterForm.css";
+
+// Типи полів форми
+type RegisterFormFields = {
+  email: string;
+  password: string;
+  confirmPassword: string;
+};
 
 // Схема валідації
 const schema = yup.object().shape({
@@ -28,17 +35,46 @@ const schema = yup.object().shape({
 });
 
 export default function RegisterForm() {
+  const navigate = useNavigate(); // ✅ ініціалізація редіректу
+
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm({
+  } = useForm<RegisterFormFields>({
     resolver: yupResolver(schema),
     mode: "onTouched",
   });
 
-  const onSubmit = (data: unknown) => {
-    console.log("Registration data:", data);
+  const onSubmit = async (data: RegisterFormFields) => {
+    try {
+      const response = await fetch("http://localhost:5045/api/Auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: data.email,
+        password: data.password,
+        confirmPassword: data.confirmPassword,
+      }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Registration failed:", errorData);
+        alert("Помилка реєстрації: " + (errorData.message || "невідома"));
+        return;
+      }
+
+      const result = await response.json();
+      console.log("Registration success:", result);
+      alert("Реєстрація успішна!");
+
+      // ✅ редірект на сторінку логіну
+      navigate("/login");
+    } catch (err) {
+      console.error("Network error:", err);
+      alert("Помилка з'єднання з сервером");
+    }
   };
 
   const allErrors = Object.values(errors).map(

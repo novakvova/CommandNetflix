@@ -1,15 +1,23 @@
-import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import "./MainPage.css";
 
 import searchIcon from "../assets/search.png";
 import homeIcon from "../assets/home.png";
 import userIcon from "../assets/Group.png";
 
-import ImageList from "../components/MainImageComponents/ImageList"; // компонент для мініатюр
-import { movies } from "../components/MainImageComponents/moviesData"; // масив фільмів
+import ImageList from "../components/MainImageComponents/ImageList";
+import { movies } from "../components/MainImageComponents/moviesData";
 
 export default function MainPage() {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // видаляємо токен
+    localStorage.removeItem("token");
+    // перенаправляємо на логін
+    navigate("/login");
+  };
+
   return (
     <div className="main">
       {/* Sidebar */}
@@ -36,7 +44,7 @@ export default function MainPage() {
         <div className="topbar">
           <div className="user-section">
             <img src={userIcon} alt="User" className="user-icon" />
-            <div className="profile">Вихід</div>
+            <div className="profile" onClick={handleLogout}>Вихід</div>
           </div>
         </div>
 
