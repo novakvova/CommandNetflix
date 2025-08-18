@@ -1,0 +1,160 @@
+.main {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background: black;
+  color: white;
+  overflow: hidden; /* фіксує все */
+}
+
+/* ===== Sidebar ===== */
+.sidebar {
+  width: 60px;
+  background: black;
+  border-right: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.icon img {
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
+
+/* ===== Підсвітка тільки для search і home ===== */
+.icon.search,
+.icon.home {
+  position: relative;
+}
+
+.icon.search::after,
+.icon.home::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: red;
+  transition: width 0.3s;
+}
+
+.icon.search:hover::after,
+.icon.home:hover::after {
+  width: 100%;
+}
+
+/* ===== Topbar ===== */
+.topbar {
+  text-transform: uppercase;
+  height: 60px;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 20px;
+  border-bottom: 1px solid #333;
+}
+.topbar img {
+  width: 30px;
+  height: 30px;
+}
+
+/* ===== Exit (Вихід) ===== */
+.profile {
+  position: relative;
+  cursor: pointer;
+}
+
+.profile::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: red;
+  transition: width 0.3s;
+}
+
+.profile:hover::after {
+  width: 100%;
+}
+
+/* ===== Grid з фільмами ===== */
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.overlay {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background: linear-gradient(to top, black, transparent);
+  padding: 5px;
+  font-size: 14px;
+  font-weight: bold;
+}
+.icon.active::after {
+  width: 100%;
+}
+.user-section {
+  position: absolute;
+  right: 40px;
+  top: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-icon {
+  width: 22px;
+  height: 22px;
+}
+.search-box {
+  display: flex;
+  align-items: center;
+  border: 1px solid #fff;
+  border-radius: 6px;
+  background: #000;
+  color: #fff;
+  width: 260px;
+  overflow: hidden;
+}
+
+.search-box input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #fff;
+  font-size: 14px;
+  padding: 8px 12px;
+}
+
+.search-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1a1a1a;
+  border: none;
+
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.search-btn:hover {
+  background: #e50914;
+}
+
+.search-btn img {
+  width: 20px;
+  height: 20px;
+}

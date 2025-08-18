@@ -1,0 +1,41 @@
+/* ===== ImageList як grid ===== */
+.image-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 колонки */
+  gap: 15px;
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.image-item {
+  max-height: 650px;
+  height: max-content;
+  position: relative;
+  overflow: hidden;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.image-item:hover {
+  transform: scale(1.05);
+}
+
+.image-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-item p {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  margin: 0;
+  padding: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  background: linear-gradient(to top, black, transparent);
+  color: white;
+}

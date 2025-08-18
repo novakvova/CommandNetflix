@@ -1,7 +1,8 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useState } from "react";
-import StartPage from "./pages/StartPage";
-
+// import StartPage from "./pages/StartPage";
+import MainPage from "./pages/MainPage";
+import SearchPage from "./pages/SearchPage";
 export default function App() {
   const [isLoggedIn] = useState(false);
 
@@ -15,8 +16,10 @@ export default function App() {
           </>
         ) : (
           <>
-            <Route path="/" element={<StartPage />} />
+            <Route path="/" element={<MainPage />} />
             <Route path="*" element={<Navigate to="/" />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/home" element={<MainPage />} />
           </>
         )}
       </Routes>

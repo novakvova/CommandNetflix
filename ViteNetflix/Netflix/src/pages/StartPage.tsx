@@ -32,7 +32,7 @@ export default function StartPage() {
         src={logo}
         alt="Netflix"
         className="logo"
-        onClick={handleLogoClick} // клік на логотип
+        onClick={handleLogoClick}
         style={{ cursor: "pointer" }}
       />
 
