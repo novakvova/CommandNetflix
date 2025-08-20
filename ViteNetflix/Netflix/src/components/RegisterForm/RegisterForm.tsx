@@ -46,36 +46,60 @@ export default function RegisterForm() {
     mode: "onTouched",
   });
 
-  const onSubmit = async (data: RegisterFormFields) => {
-    try {
-      const response = await fetch("http://localhost:5045/api/Auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+const onSubmit = async (data: RegisterFormFields) => {
+  try {
+    const response = await fetch("http://localhost:5045/api/Auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email: data.email,
         password: data.password,
         confirmPassword: data.confirmPassword,
       }),
-      });
+    });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Registration failed:", errorData);
-        alert("Помилка реєстрації: " + (errorData.message || "невідома"));
-        return;
-      }
+    if (!response.ok) {
+      // Пробуємо дістати помилку з JSON/ProblemDetails або як текст
+      const raw = await response.text();
+      let parsed: any;
+      try { parsed = JSON.parse(raw); } catch { parsed = null; }
 
-      const result = await response.json();
-      console.log("Registration success:", result);
-      alert("Реєстрація успішна!");
+      const serverMsg =
+        typeof parsed === "string"
+          ? parsed
+          : parsed?.message ||
+            parsed?.title ||
+            parsed?.detail ||
+            (parsed?.errors
+              ? Object.values(parsed.errors).flat()[0]
+              : null) ||
+            raw ||
+            "невідома";
 
-      // ✅ редірект на сторінку логіну
-      navigate("/login");
-    } catch (err) {
-      console.error("Network error:", err);
-      alert("Помилка з'єднання з сервером");
+      console.error("Registration failed:", parsed ?? raw);
+      alert("Помилка реєстрації: " + serverMsg);
+      return;
     }
-  };
+
+    // Успіх: якщо є JSON — прочитаємо, якщо ні — просто продовжимо
+    const ct = response.headers.get("content-type") || "";
+    if (ct.includes("application/json")) {
+      try {
+        const result = await response.json();
+        console.log("Registration success:", result);
+      } catch {
+        // тіло відсутнє або не JSON — це ок
+      }
+    }
+
+    alert("Реєстрація успішна!");
+    navigate("/login");
+  } catch (err) {
+    console.error("Network error:", err);
+    alert("Помилка з'єднання з сервером");
+  }
+};
+
 
   const allErrors = Object.values(errors).map(
     (err) => (err as { message?: string }).message
