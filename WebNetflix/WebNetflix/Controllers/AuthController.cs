@@ -62,7 +62,7 @@ namespace WebNetflix.Controllers
             await _db.SaveChangesAsync();
 
             _logger.LogInformation("User {Email} registered successfully", email);
-            return StatusCode(201); // Created
+            return Created("", new { message = "User registered successfully" });
         }
 
         // POST: /api/auth/login
