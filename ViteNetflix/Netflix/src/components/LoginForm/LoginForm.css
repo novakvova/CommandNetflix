@@ -69,3 +69,16 @@ h2 {
   color: red;
   margin-top: 1rem !important;
 }
+.forgot-password {
+  text-align: left;
+}
+
+.forgot-password a {
+  font-size: 0.9rem;
+  color: #820000;
+  text-decoration: none;
+}
+
+.forgot-password a:hover {
+  text-decoration: underline;
+}
