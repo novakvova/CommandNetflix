@@ -5,6 +5,7 @@ import { Button } from "primereact/button";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../AuthContext"; // ✅ імпортуємо контекст
 
 import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primereact/resources/primereact.min.css";
@@ -27,6 +28,7 @@ type LoginFormFields = {
 
 export default function LoginForm() {
   const navigate = useNavigate();
+  const { login } = useAuth(); // ✅ дістаємо login з контексту
 
   const {
     control,
@@ -38,53 +40,44 @@ export default function LoginForm() {
     mode: "onTouched",
   });
 
-const onSubmit = async (data: LoginFormFields) => {
-  try {
-    const response = await fetch("http://localhost:5045/api/Auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: data.email,
-        password: data.password,
-      }),
-    });
+  const onSubmit = async (data: LoginFormFields) => {
+    try {
+      const response = await fetch("http://localhost:5045/api/Auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      alert("Помилка входу: " + (errorData.message || "невідома"));
-      return;
+      if (!response.ok) {
+        const errorData = await response.json();
+        alert("Помилка входу: " + (errorData.message || "невідома"));
+        return;
+      }
+
+      const result = await response.json();
+      const token = result.token;
+      console.log("Login success:", result);
+
+      login(token);
+
+      const meResponse = await fetch("http://localhost:5045/api/Auth/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (meResponse.ok) {
+        const user = await meResponse.json();
+        console.log("User info:", user);
+
+        navigate("/home");
+      } else {
+        alert("Токен недійсний або прострочений");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("Помилка з'єднання з сервером");
     }
+  };
 
-    const result = await response.json();
-    const token = result.token;
-    console.log("Login success:", result);
-
-    // ✅ Зберігаємо токен
-    localStorage.setItem("token", token);
-
-    // ✅ Викликаємо захищений ендпоінт
-    const meResponse = await fetch("http://localhost:5045/api/Auth/me", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-if (meResponse.ok) {
-  const user = await meResponse.json();
-  console.log("User info:", user);
-
-  // ✅ Редірект після успішного логіну та отримання даних
-  navigate("/home");
-} else {
-  console.error("Token invalid or expired");
-  alert("Токен недійсний або прострочений");
-}
-
-  } catch (err) {
-    console.error("Network error:", err);
-    alert("Помилка з'єднання з сервером");
-  }
-};
-
-  // Помилки тільки для непустих полів
   const allErrors = Object.entries(errors)
     .map(([name, err]) => {
       const fieldValue = getValues(name as keyof LoginFormFields);
@@ -120,7 +113,6 @@ if (meResponse.ok) {
         <label htmlFor="password">Пароль</label>
       </span>
 
-      {/* Вивід всіх помилок */}
       {allErrors.length > 0 && (
         <div className="form-errors">
           {allErrors.map((err, i) => (
@@ -128,7 +120,9 @@ if (meResponse.ok) {
           ))}
         </div>
       )}
-
+      <div className="forgot-password">
+        <a href="/forgot-password">Забули пароль?</a>
+      </div>
       <Button
         type="submit"
         label="Увійти"

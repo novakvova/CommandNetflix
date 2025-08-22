@@ -7,17 +7,16 @@ import userIcon from "../assets/Group.png";
 
 import ImageList from "../components/MainImageComponents/ImageList";
 import { movies } from "../components/MainImageComponents/moviesData";
+import { useAuth } from "../AuthContext";
 
 export default function MainPage() {
   const navigate = useNavigate();
+  const { logout } = useAuth(); // ✅ беремо logout з контексту
 
   const handleLogout = () => {
-    // видаляємо токен
-    localStorage.removeItem("token");
-    // перенаправляємо на логін
-    navigate("/login");
+    logout(); // ✅ очистить localStorage + оновить isLoggedIn
+    navigate("/"); // ✅ редірект на старт
   };
-
   return (
     <div className="main">
       {/* Sidebar */}
@@ -44,7 +43,9 @@ export default function MainPage() {
         <div className="topbar">
           <div className="user-section">
             <img src={userIcon} alt="User" className="user-icon" />
-            <div className="profile" onClick={handleLogout}>Вихід</div>
+            <div className="profile" onClick={handleLogout}>
+              Вихід
+            </div>
           </div>
         </div>
 
