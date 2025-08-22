@@ -9,6 +9,7 @@ namespace WebNetflix.Data
 
         public DbSet<User> Users => Set<User>();
         public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
+        public DbSet<Trailer> Trailers => Set<Trailer>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
