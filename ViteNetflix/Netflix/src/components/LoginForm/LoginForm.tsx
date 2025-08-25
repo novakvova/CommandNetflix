@@ -5,14 +5,13 @@ import { Button } from "primereact/button";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../AuthContext"; // ✅ імпортуємо контекст
+import { useAuth } from "../../AuthContext";
 
 import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import "./LoginForm.css";
 
-// ✅ Схема валідації
 const schema = yup.object().shape({
   email: yup
     .string()
@@ -25,10 +24,13 @@ type LoginFormFields = {
   email: string;
   password: string;
 };
+type LoginFormProps = {
+  onShowRegister: () => void;
+};
 
-export default function LoginForm() {
+export default function LoginForm({ onShowRegister }: LoginFormProps) {
   const navigate = useNavigate();
-  const { login } = useAuth(); // ✅ дістаємо login з контексту
+  const { login } = useAuth();
 
   const {
     control,
@@ -123,12 +125,18 @@ export default function LoginForm() {
       <div className="forgot-password">
         <a href="/forgot-password">Забули пароль?</a>
       </div>
+
       <Button
         type="submit"
         label="Увійти"
         className="p-button-primary"
         style={{ marginTop: "2rem" }}
       />
+      <div className="register-link">
+        <a type="button" onClick={onShowRegister}>
+          Зареєструватися
+        </a>
+      </div>
     </form>
   );
 }

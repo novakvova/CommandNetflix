@@ -43,7 +43,11 @@ export default function StartPage() {
 
       {(activeForm === "login" || activeForm === "register") && (
         <div className={`login-overlay ${formClosing ? "closing" : ""}`}>
-          {activeForm === "login" ? <LoginForm /> : <RegisterForm />}
+          {activeForm === "login" ? (
+            <LoginForm onShowRegister={() => setActiveForm("register")} />
+          ) : (
+            <RegisterForm onShowLogin={() => setActiveForm("login")} />
+          )}
         </div>
       )}
     </div>

@@ -57,7 +57,7 @@ h2 {
   cursor: pointer;
   color: white;
   transition: background 0.3s ease;
-  margin: 25px 0 !important;
+  margin: 5px 0 !important;
 }
 .p-button-primary:hover {
   background-color: #610000;
