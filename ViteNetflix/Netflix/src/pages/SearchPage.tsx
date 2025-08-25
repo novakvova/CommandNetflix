@@ -1,43 +1,37 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./MainPage.css";
 
 import searchIcon from "../assets/search.png";
 import userIcon from "../assets/Group.png";
 import { useAuth } from "../AuthContext";
-import ImageList, { type Movie } from "../components/MainImageComponents/ImageList";
+import ImageList from "../components/MainImageComponents/ImageList";
 import LoadingSpinner from "../components/LoadingSpinner/LoadingSpinner";
 import HeaderAndRightPanel from "../components/HeaderAndRightPanel/HeaderAndRightPanel";
-import Banner from "../components/Banner/Banner";
-import TrailerModal from "../components/TrailerModal/TrailerModal";
 
 const API_URL = "http://localhost:5045/api/trailers";
 
-export default function SearchPage() {
-  const navigate = useNavigate();
-  const { logout } = useAuth();
+interface Movie {
+  title: string;
+  img: string;
+}
 
+export default function SearchPage() {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // стан пошуку
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState(query);
 
-  // стан для трейлерів / банера
-  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
-  const [youTubeCode, setYouTubeCode] = useState<string | null>(null);
-
-  const contentRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const navigate = useNavigate();
+  const { logout } = useAuth();
 
-  // debounce
   useEffect(() => {
     const t = setTimeout(() => setDebouncedQuery(query), 300);
     return () => clearTimeout(t);
   }, [query]);
 
-  // fetch при зміні debouncedQuery
   useEffect(() => {
     setLoading(true);
 
@@ -51,23 +45,26 @@ export default function SearchPage() {
       ? `${API_URL}?search=${encodeURIComponent(debouncedQuery)}`
       : API_URL;
 
+    console.log("[SearchPage] fetch:", url);
+
     fetch(url, { signal: controller.signal })
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
       })
       .then((data: any[]) => {
+        console.log("[SearchPage] items:", data.length);
         setMovies(
           (data || []).map((t: any) => ({
             title: t.title,
             img: t.imageUrl,
-            description: t.description || "Немає опису",
-            youTubeCode: t.youTubeCode || "",
           }))
         );
       })
       .catch((err) => {
-        if ((err as any).name !== "AbortError") {
+        if ((err as any).name === "AbortError") {
+          console.log("[SearchPage] fetch aborted");
+        } else {
           console.error("[SearchPage] fetch error:", err);
         }
       })
@@ -83,27 +80,20 @@ export default function SearchPage() {
     navigate("/");
   };
 
+  // обов’язкова функція для ImageList
   const handleMovieClick = (movie: Movie) => {
-    setSelectedMovie(movie);
-    setYouTubeCode(null);
-    if (contentRef.current) {
-      contentRef.current.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  };
-
-  const handlePlayTrailer = () => {
-    if (selectedMovie && selectedMovie.youTubeCode) {
-      setYouTubeCode(selectedMovie.youTubeCode);
-    } else {
-      alert("Немає трейлера для цього фільму");
-    }
+    console.log("Вибрано фільм:", movie.title);
+    // тут можна буде відкрити Banner або трейлер
   };
 
   return (
     <div className="main">
       <HeaderAndRightPanel>
         <div className="search-box">
-          <button className="search-btn" onClick={() => setDebouncedQuery(query)}>
+          <button
+            className="search-btn"
+            onClick={() => setDebouncedQuery(query)}
+          >
             <img src={searchIcon} alt="Search" />
           </button>
           <input
@@ -123,29 +113,12 @@ export default function SearchPage() {
         </div>
       </HeaderAndRightPanel>
 
-      <div className="content" ref={contentRef}>
+      {/* Контент */}
+      <div className="content">
         {loading ? (
           <LoadingSpinner />
         ) : (
-          <>
-            {selectedMovie && (
-              <>
-                <Banner
-                  title={selectedMovie.title}
-                  description={selectedMovie.description ?? ""}
-                  youTubeCode={selectedMovie.youTubeCode ?? ""}
-                  onPlayTrailer={handlePlayTrailer}
-                />
-                {youTubeCode && (
-                  <TrailerModal
-                    videoKey={youTubeCode}
-                    onClose={() => setYouTubeCode(null)}
-                  />
-                )}
-              </>
-            )}
-            <ImageList images={movies} onMovieClick={handleMovieClick} />
-          </>
+          <ImageList images={movies} onMovieClick={handleMovieClick} />
         )}
       </div>
     </div>
