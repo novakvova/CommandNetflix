@@ -18,9 +18,17 @@ namespace WebNetflix.Controllers
 
         // GET: api/trailers
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Trailer>>> GetTrailers()
+        public async Task<ActionResult<IEnumerable<Trailer>>> GetTrailers([FromQuery] string? search)
         {
-            return await _context.Trailers.ToListAsync();
+            var query = _context.Trailers.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var s = search.Trim().ToLower();
+                query = query.Where(t => t.Title.ToLower().Contains(s));
+            }
+
+            return await query.ToListAsync();
         }
 
         // GET: api/trailers/5
