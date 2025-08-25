@@ -1,22 +1,33 @@
 import { NavLink } from "react-router-dom";
 import searchIcon from "../../assets/search.png";
 import homeIcon from "../../assets/home.png";
-import React from "react";
+import React, { useState } from "react";
+import type { ChangeEvent } from "react";
 import "../../pages/MainPage.css";
+
 interface Props {
-  children?: React.ReactNode; // для кастомного контенту всередині topbar
+  children?: React.ReactNode;
+  onSearch?: (term: string) => void;
 }
 
-export default function HeaderAndRightPanel({ children }: Props) {
+export default function HeaderAndRightPanel({ children, onSearch }: Props) {
+  const [value, setValue] = useState("");
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const v = e.target.value;
+    setValue(v);
+    if (onSearch) {
+      onSearch(v); // миттєво передаємо — debounce робимо на MainPage
+    }
+  };
+
   return (
     <>
       {/* Sidebar */}
       <div className="sidebar">
         <NavLink
           to="/search"
-          className={({ isActive }) =>
-            `icon search ${isActive ? "active" : ""}`
-          }
+          className={({ isActive }) => `icon search ${isActive ? "active" : ""}`}
         >
           <img src={searchIcon} alt="Search" />
         </NavLink>
@@ -29,7 +40,20 @@ export default function HeaderAndRightPanel({ children }: Props) {
       </div>
 
       {/* Topbar */}
-      <div className="topbar">{children}</div>
+      <div className="topbar">
+        {/* Пошуковий інпут */}
+        {onSearch && (
+          <input
+            className="header-search-input"
+            type="text"
+            value={value}
+            onChange={handleChange}
+            placeholder="Пошук фільмів..."
+            aria-label="search"
+          />
+        )}
+        {children}
+      </div>
     </>
   );
 }
