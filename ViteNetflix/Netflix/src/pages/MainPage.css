@@ -50,14 +50,18 @@
 
 /* ===== Topbar ===== */
 .topbar {
-  text-transform: uppercase;
+  position: fixed; /* завжди зверху */
+  top: 0;
+  left: 60px; /* щоб не перекривав sidebar */
+  right: 0;
   height: 60px;
-  flex-shrink: 0;
+  background: black;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: space-between;
   padding: 0 20px;
   border-bottom: 1px solid #333;
+  z-index: 1000; /* поверх контенту */
 }
 .topbar img {
   width: 30px;
@@ -90,7 +94,8 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;
+  margin-top: 60px;
 }
 
 .overlay {
@@ -106,12 +111,13 @@
   width: 100%;
 }
 .user-section {
-  position: absolute;
-  right: 40px;
-  top: 15px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .user-icon {
@@ -119,13 +125,14 @@
   height: 22px;
 }
 .search-box {
+  flex: 1; /* займає всю доступну ширину */
+  max-width: 500px; /* можна обмежити */
   display: flex;
   align-items: center;
   border: 1px solid #fff;
   border-radius: 6px;
   background: #000;
   color: #fff;
-  width: 260px;
   overflow: hidden;
 }
 
