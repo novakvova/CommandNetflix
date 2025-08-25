@@ -1,0 +1,15 @@
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #000000;
+}
+
+.spinner {
+  width: 64px;
+  height: 64px;
+  border: 6px solid red;
+  border-top-color: transparent;
+  border-radius: 50%;
+}
