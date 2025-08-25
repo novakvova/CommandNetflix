@@ -39,3 +39,32 @@
   background: linear-gradient(to top, black, transparent);
   color: white;
 }
+/* ===== Адаптив ===== */
+
+/* Планшети */
+@media (max-width: 1200px) {
+  .image-list {
+    grid-template-columns: repeat(3, 1fr); /* 3 колонки */
+  }
+}
+
+/* Смартфони горизонтальні */
+@media (max-width: 900px) {
+  .image-list {
+    grid-template-columns: repeat(2, 1fr); /* 2 колонки */
+  }
+}
+
+/* Смартфони вертикальні */
+@media (max-width: 600px) {
+  .image-list {
+    grid-template-columns: 1fr; /* 1 колонка */
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .image-item p {
+    font-size: 12px;
+    padding: 4px;
+  }
+}
