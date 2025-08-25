@@ -33,9 +33,11 @@ const schema = yup.object().shape({
     .oneOf([yup.ref("password")], "Ⓧ Паролі не співпадають")
     .required("Ⓧ Підтвердити пароль обов'язкове"),
 });
-
-export default function RegisterForm() {
-  const navigate = useNavigate(); // ✅ ініціалізація редіректу
+type RegisterFormProps = {
+  onShowLogin: () => void;
+};
+export default function RegisterForm({ onShowLogin }: RegisterFormProps) {
+  const navigate = useNavigate();
 
   const {
     control,
@@ -46,60 +48,63 @@ export default function RegisterForm() {
     mode: "onTouched",
   });
 
-const onSubmit = async (data: RegisterFormFields) => {
-  try {
-    const response = await fetch("http://localhost:5045/api/Auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: data.email,
-        password: data.password,
-        confirmPassword: data.confirmPassword,
-      }),
-    });
+  const onSubmit = async (data: RegisterFormFields) => {
+    try {
+      const response = await fetch("http://localhost:5045/api/Auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+          confirmPassword: data.confirmPassword,
+        }),
+      });
 
-    if (!response.ok) {
-      // Пробуємо дістати помилку з JSON/ProblemDetails або як текст
-      const raw = await response.text();
-      let parsed: any;
-      try { parsed = JSON.parse(raw); } catch { parsed = null; }
+      if (!response.ok) {
+        // Пробуємо дістати помилку з JSON/ProblemDetails або як текст
+        const raw = await response.text();
+        let parsed: any;
+        try {
+          parsed = JSON.parse(raw);
+        } catch {
+          parsed = null;
+        }
 
-      const serverMsg =
-        typeof parsed === "string"
-          ? parsed
-          : parsed?.message ||
-            parsed?.title ||
-            parsed?.detail ||
-            (parsed?.errors
-              ? Object.values(parsed.errors).flat()[0]
-              : null) ||
-            raw ||
-            "невідома";
+        const serverMsg =
+          typeof parsed === "string"
+            ? parsed
+            : parsed?.message ||
+              parsed?.title ||
+              parsed?.detail ||
+              (parsed?.errors
+                ? Object.values(parsed.errors).flat()[0]
+                : null) ||
+              raw ||
+              "невідома";
 
-      console.error("Registration failed:", parsed ?? raw);
-      alert("Помилка реєстрації: " + serverMsg);
-      return;
-    }
-
-    // Успіх: якщо є JSON — прочитаємо, якщо ні — просто продовжимо
-    const ct = response.headers.get("content-type") || "";
-    if (ct.includes("application/json")) {
-      try {
-        const result = await response.json();
-        console.log("Registration success:", result);
-      } catch {
-        // тіло відсутнє або не JSON — це ок
+        console.error("Registration failed:", parsed ?? raw);
+        alert("Помилка реєстрації: " + serverMsg);
+        return;
       }
+
+      // Успіх: якщо є JSON — прочитаємо, якщо ні — просто продовжимо
+      const ct = response.headers.get("content-type") || "";
+      if (ct.includes("application/json")) {
+        try {
+          const result = await response.json();
+          console.log("Registration success:", result);
+        } catch {
+          // тіло відсутнє або не JSON — це ок
+        }
+      }
+
+      alert("Реєстрація успішна!");
+      navigate("/login");
+    } catch (err) {
+      console.error("Network error:", err);
+      alert("Помилка з'єднання з сервером");
     }
-
-    alert("Реєстрація успішна!");
-    navigate("/login");
-  } catch (err) {
-    console.error("Network error:", err);
-    alert("Помилка з'єднання з сервером");
-  }
-};
-
+  };
 
   const allErrors = Object.values(errors).map(
     (err) => (err as { message?: string }).message
@@ -161,6 +166,11 @@ const onSubmit = async (data: RegisterFormFields) => {
         className="p-button-primary"
         style={{ marginTop: "2rem" }}
       />
+      <div className="register-link">
+        <a type="button" onClick={onShowLogin}>
+          Увійти
+        </a>
+      </div>
     </form>
   );
 }

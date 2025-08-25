@@ -1,0 +1,46 @@
+.banner {
+  flex: none; /* не ділить простір з іншими елементами */
+  width: calc(100% + 40px); /* розтягнути на всю ширину, якщо потрібно */
+  margin-left: -20px;
+  margin-right: -20px;
+  margin-top: 60px;
+  height: 750px; /* конкретна висота банера */
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+.banner-overlay {
+  position: absolute;
+  top: 0.5;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 40px;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.897));
+  color: white;
+}
+
+.banner-title {
+  font-size: 4rem;
+  margin: 0 0 10px;
+}
+
+.banner-description {
+  font-size: 1.4rem;
+  max-width: 600px;
+  margin-bottom: 20px;
+}
+
+.banner-btn {
+  background: red;
+  border: none;
+  padding: 20px 30px;
+  font-size: 20px;
+  cursor: pointer;
+  color: white;
+  border-radius: 30px;
+}
+
+.banner-btn:hover {
+  background: darkred;
+}
