@@ -6,26 +6,45 @@ import homeIcon from "../assets/home.png";
 import userIcon from "../assets/Group.png";
 
 import ImageList from "../components/MainImageComponents/ImageList";
-import { movies } from "../components/MainImageComponents/moviesData";
 import { useAuth } from "../AuthContext";
+import { useEffect, useState } from "react";
+
+const API_URL = "http://localhost:5045/api/trailers";
 
 export default function MainPage() {
   const navigate = useNavigate();
-  const { logout } = useAuth(); // ✅ беремо logout з контексту
+  const { logout } = useAuth();
+
+  const [movies, setMovies] = useState<{ title: string; img: string }[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const handleLogout = () => {
-    logout(); // ✅ очистить localStorage + оновить isLoggedIn
-    navigate("/"); // ✅ редірект на старт
+    logout();
+    navigate("/");
   };
+
+  useEffect(() => {
+    fetch(API_URL)
+      .then((res) => res.json())
+      .then((data) =>
+        setMovies(
+          data.map((t: any) => ({
+            title: t.title,
+            img: t.imageUrl,
+          }))
+        )
+      )
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <div className="main">
       {/* Sidebar */}
       <div className="sidebar">
         <NavLink
           to="/search"
-          className={({ isActive }) =>
-            `icon search ${isActive ? "active" : ""}`
-          }
+          className={({ isActive }) => `icon search ${isActive ? "active" : ""}`}
         >
           <img src={searchIcon} alt="Search" />
         </NavLink>
@@ -50,7 +69,11 @@ export default function MainPage() {
         </div>
 
         {/* Список мініатюр */}
-        <ImageList images={movies} />
+        {loading ? (
+          <div>Завантаження...</div>
+        ) : (
+          <ImageList images={movies} />
+        )}
       </div>
     </div>
   );
