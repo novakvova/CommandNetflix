@@ -165,3 +165,24 @@
   width: 20px;
   height: 20px;
 }
+
+/* Планшети */
+@media (max-width: 1200px) {
+  .search-box {
+    max-width: 400px;
+  }
+}
+
+/* Смартфони горизонтальні */
+@media (max-width: 900px) {
+  .search-box {
+    max-width: 300px;
+  }
+}
+
+/* Смартфони вертикальні */
+@media (max-width: 600px) {
+  .search-box {
+    max-width: 200px;
+  }
+}
