@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import { useState, useMemo } from "react";
 import "./ImageList.css";
 import { Dropdown } from "primereact/dropdown";
+
 export interface Movie {
   title: string;
   img: string;
   description?: string;
   youTubeCode?: string;
+  rating?: number;
 }
 
 interface ImageListProps {
@@ -14,34 +16,70 @@ interface ImageListProps {
 }
 
 export default function ImageList({ images, onMovieClick }: ImageListProps) {
-  const [selectedCity, setSelectedCity] = useState(null);
-  const cities = [
-    { name: "New York", code: "NY" },
-    { name: "Rome", code: "RM" },
-    { name: "London", code: "LDN" },
-    { name: "Istanbul", code: "IST" },
-    { name: "Paris", code: "PRS" },
+  const [sortOption, setSortOption] = useState<string | null>(null);
+
+  const sortOptions = [
+    { label: "За назвою (А → Я)", value: "titleAsc" },
+    { label: "За назвою (Я → А)", value: "titleDesc" },
+    { label: "За рейтингом (високий → низький)", value: "ratingDesc" },
+    { label: "За рейтингом (низький → високий)", value: "ratingAsc" },
   ];
+
+  const sortedMovies = useMemo(() => {
+    const sorted = [...images];
+    const getRating = (m: Movie) => Number(m?.rating ?? 0);
+
+    switch (sortOption) {
+      case "titleAsc":
+        sorted.sort((a, b) => a.title.localeCompare(b.title));
+        break;
+      case "titleDesc":
+        sorted.sort((a, b) => b.title.localeCompare(a.title));
+        break;
+      case "ratingAsc":
+        sorted.sort((a, b) => {
+          const diff = getRating(a) - getRating(b);
+          return diff !== 0 ? diff : a.title.localeCompare(b.title);
+        });
+        break;
+      case "ratingDesc":
+        sorted.sort((a, b) => {
+          const diff = getRating(b) - getRating(a);
+          return diff !== 0 ? diff : a.title.localeCompare(b.title);
+        });
+        break;
+      default:
+        break;
+    }
+    return sorted;
+  }, [images, sortOption]);
+
   return (
     <>
       <div className="card flex justify-content-center Dropdown">
         <Dropdown
-          value={selectedCity}
-          onChange={(e) => setSelectedCity(e.value)}
-          options={cities}
-          optionLabel="name"
-          placeholder="Sort Films"
+          value={sortOption}
+          onChange={(e: any) => setSortOption(e.value)}
+          options={sortOptions}
+          optionLabel="label"
+          placeholder="Сортувати фільми"
           className="w-full md:w-14rem"
         />
       </div>
+
       <div className="image-list">
-        {images.map((movie, index) => (
+        {sortedMovies.map((movie, index) => (
           <div
             key={index}
             className="image-item"
             onClick={() => onMovieClick(movie)}
           >
             <img src={movie.img} alt={movie.title} />
+            {/* Рейтинг у верхньому правому кутку */}
+            {movie.rating !== undefined && (
+              <span className="rating">⭐ {movie.rating.toFixed(1)}</span>
+            )}
+            {/* Назва внизу */}
             <p>{movie.title}</p>
           </div>
         ))}
