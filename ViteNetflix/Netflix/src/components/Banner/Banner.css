@@ -44,3 +44,22 @@
 .banner-btn:hover {
   background: darkred;
 }
+.banner-rating {
+  display: inline-block;
+  position: relative;
+  margin-left: 5px;
+  background-color: rgba(0, 0, 0, 0.438);
+  color: #fff;
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+
+.banner-rating img {
+  width: 20px;
+  height: 20px;
+  margin-top: 3px;
+  margin-right: 8px;
+}
+.banner-rating span {
+  font-size: 20px;
+}
