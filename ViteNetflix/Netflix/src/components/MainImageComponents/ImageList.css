@@ -1,5 +1,6 @@
 /* ===== ImageList як grid ===== */
 .image-list {
+  margin-top: 10px;
   display: grid;
   grid-template-columns: repeat(4, 1fr); /* 4 колонки */
   gap: 15px;
@@ -65,4 +66,30 @@
     font-size: 12px;
     padding: 4px;
   }
+}
+
+.Dropdown {
+  margin-top: 50px !important;
+}
+.Dropdown .p-dropdown {
+  height: 44px !important;
+  background-color: #000000 !important; /* фон */
+  border: 1px solid #ffffff !important; /* обводка */
+  color: #fff !important; /* текст */
+}
+
+.Dropdown .p-dropdown .p-dropdown-label {
+  height: 42px !important;
+  border: none !important; /* обводка */
+  color: #fff !important;
+  background-color: #000000 !important;
+}
+
+.Dropdown .p-dropdown .p-dropdown-items {
+  background-color: #18122b !important; /* фон випадаючого меню */
+  color: #fff !important;
+}
+
+.Dropdown .p-dropdown .p-dropdown-items .p-dropdown-item:hover {
+  background-color: #393053 !important; /* ховер */
 }
