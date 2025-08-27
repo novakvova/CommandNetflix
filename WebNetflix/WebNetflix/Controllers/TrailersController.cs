@@ -18,9 +18,9 @@ namespace WebNetflix.Controllers
 
         // GET: api/trailers
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Trailer>>> GetTrailers([FromQuery] string? search)
+        public async Task<ActionResult<IEnumerable<TrailerDto>>> GetTrailers([FromQuery] string? search)
         {
-            var query = _context.Trailers.AsQueryable();
+            var query = _context.Trailers.Include(t => t.Genres).AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(search))
             {
@@ -28,51 +28,114 @@ namespace WebNetflix.Controllers
                 query = query.Where(t => t.Title.ToLower().Contains(s));
             }
 
-            return await query.ToListAsync();
+            var trailers = await query.ToListAsync();
+
+            // Мапимо на DTO
+            var dtos = trailers.Select(t => new TrailerDto
+            {
+                Id = t.Id,
+                Title = t.Title,
+                ImageUrl = t.ImageUrl,
+                YouTubeCode = t.YouTubeCode,
+                Rating = t.Rating,
+                Description = t.Description,
+                Genres = t.Genres.Select(g => new GenreDto { Id = g.Id, Name = g.Name }).ToList()
+            });
+
+            return Ok(dtos);
         }
 
         // GET: api/trailers/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Trailer>> GetTrailer(int id)
+        public async Task<ActionResult<TrailerDto>> GetTrailer(int id)
         {
-            var trailer = await _context.Trailers.FindAsync(id);
+            var trailer = await _context.Trailers
+                .Include(t => t.Genres)
+                .FirstOrDefaultAsync(t => t.Id == id);
 
             if (trailer == null)
                 return NotFound();
 
-            return trailer;
+            var dto = new TrailerDto
+            {
+                Id = trailer.Id,
+                Title = trailer.Title,
+                ImageUrl = trailer.ImageUrl,
+                YouTubeCode = trailer.YouTubeCode,
+                Rating = trailer.Rating,
+                Description = trailer.Description,
+                Genres = trailer.Genres.Select(g => new GenreDto { Id = g.Id, Name = g.Name }).ToList()
+            };
+
+            return Ok(dto);
         }
 
         // POST: api/trailers
         [HttpPost]
-        public async Task<ActionResult<Trailer>> PostTrailer(Trailer trailer)
+        public async Task<ActionResult<TrailerDto>> PostTrailer([FromBody] TrailerCreateDto dto)
         {
+            var trailer = new Trailer
+            {
+                Title = dto.Title,
+                ImageUrl = dto.ImageUrl,
+                YouTubeCode = dto.YouTubeCode,
+                Rating = dto.Rating,
+                Description = dto.Description
+            };
+
+            if (dto.GenresIds.Any())
+            {
+                trailer.Genres = await _context.Genres
+                    .Where(g => dto.GenresIds.Contains(g.Id))
+                    .ToListAsync();
+            }
+
             _context.Trailers.Add(trailer);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetTrailer), new { id = trailer.Id }, trailer);
+            var resultDto = new TrailerDto
+            {
+                Id = trailer.Id,
+                Title = trailer.Title,
+                ImageUrl = trailer.ImageUrl,
+                YouTubeCode = trailer.YouTubeCode,
+                Rating = trailer.Rating,
+                Description = trailer.Description,
+                Genres = trailer.Genres.Select(g => new GenreDto { Id = g.Id, Name = g.Name }).ToList()
+            };
+
+            return CreatedAtAction(nameof(GetTrailer), new { id = trailer.Id }, resultDto);
         }
 
         // PUT: api/trailers/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTrailer(int id, Trailer trailer)
+        public async Task<IActionResult> PutTrailer(int id, TrailerCreateDto dto)
         {
-            if (id != trailer.Id)
-                return BadRequest();
+            var trailer = await _context.Trailers
+                .Include(t => t.Genres)
+                .FirstOrDefaultAsync(t => t.Id == id);
 
-            _context.Entry(trailer).State = EntityState.Modified;
+            if (trailer == null)
+                return NotFound();
 
-            try
+            // Оновлюємо поля
+            trailer.Title = dto.Title;
+            trailer.ImageUrl = dto.ImageUrl;
+            trailer.YouTubeCode = dto.YouTubeCode;
+            trailer.Rating = dto.Rating;
+            trailer.Description = dto.Description;
+
+            // Оновлюємо жанри
+            trailer.Genres.Clear();
+            if (dto.GenresIds.Any())
             {
-                await _context.SaveChangesAsync();
+                var genres = await _context.Genres
+                    .Where(g => dto.GenresIds.Contains(g.Id))
+                    .ToListAsync();
+                trailer.Genres = genres;
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.Trailers.Any(e => e.Id == id))
-                    return NotFound();
 
-                throw;
-            }
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }

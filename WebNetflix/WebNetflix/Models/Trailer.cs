@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace WebNetflix.Models
 {
@@ -23,5 +24,11 @@ namespace WebNetflix.Models
 
         [MaxLength(999)]
         public string? Description { get; set; }
+
+        public ICollection<Genre> Genres { get; set; } = new List<Genre>();
+
+
+        [JsonIgnore]
+        public ICollection<User> FavoritedByUsers { get; set; } = new List<User>();
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WebNetflix.Data;
@@ -11,9 +12,11 @@ using WebNetflix.Data;
 namespace WebNetflix.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250826132115_AddGenresAndTrailerGenres")]
+    partial class AddGenresAndTrailerGenres
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -75,21 +78,6 @@ namespace WebNetflix.Migrations
                         .IsUnique();
 
                     b.ToTable("Users", "neondb_owner");
-                });
-
-            modelBuilder.Entity("UserFavoriteTrailer", b =>
-                {
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("TrailerId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("UserId", "TrailerId");
-
-                    b.HasIndex("TrailerId");
-
-                    b.ToTable("UserFavoriteTrailers", "neondb_owner");
                 });
 
             modelBuilder.Entity("WebNetflix.Models.Genre", b =>
@@ -186,21 +174,6 @@ namespace WebNetflix.Migrations
                     b.HasOne("WebNetflix.Models.Trailer", null)
                         .WithMany()
                         .HasForeignKey("TrailerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("UserFavoriteTrailer", b =>
-                {
-                    b.HasOne("WebNetflix.Models.Trailer", null)
-                        .WithMany()
-                        .HasForeignKey("TrailerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

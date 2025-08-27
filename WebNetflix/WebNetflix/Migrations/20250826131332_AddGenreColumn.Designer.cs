@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WebNetflix.Data;
@@ -11,9 +12,11 @@ using WebNetflix.Data;
 namespace WebNetflix.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250826131332_AddGenreColumn")]
+    partial class AddGenreColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,21 +25,6 @@ namespace WebNetflix.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("TrailerGenre", b =>
-                {
-                    b.Property<int>("TrailerId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("GenreId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("TrailerId", "GenreId");
-
-                    b.HasIndex("GenreId");
-
-                    b.ToTable("TrailerGenres", "neondb_owner");
-                });
 
             modelBuilder.Entity("User", b =>
                 {
@@ -75,39 +63,6 @@ namespace WebNetflix.Migrations
                         .IsUnique();
 
                     b.ToTable("Users", "neondb_owner");
-                });
-
-            modelBuilder.Entity("UserFavoriteTrailer", b =>
-                {
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("TrailerId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("UserId", "TrailerId");
-
-                    b.HasIndex("TrailerId");
-
-                    b.ToTable("UserFavoriteTrailers", "neondb_owner");
-                });
-
-            modelBuilder.Entity("WebNetflix.Models.Genre", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Genres", "neondb_owner");
                 });
 
             modelBuilder.Entity("WebNetflix.Models.PasswordResetToken", b =>
@@ -153,6 +108,10 @@ namespace WebNetflix.Migrations
                         .HasMaxLength(999)
                         .HasColumnType("character varying(999)");
 
+                    b.Property<string>("Genre")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("text");
@@ -173,36 +132,6 @@ namespace WebNetflix.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Trailers", "neondb_owner");
-                });
-
-            modelBuilder.Entity("TrailerGenre", b =>
-                {
-                    b.HasOne("WebNetflix.Models.Genre", null)
-                        .WithMany()
-                        .HasForeignKey("GenreId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WebNetflix.Models.Trailer", null)
-                        .WithMany()
-                        .HasForeignKey("TrailerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("UserFavoriteTrailer", b =>
-                {
-                    b.HasOne("WebNetflix.Models.Trailer", null)
-                        .WithMany()
-                        .HasForeignKey("TrailerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("WebNetflix.Models.PasswordResetToken", b =>
