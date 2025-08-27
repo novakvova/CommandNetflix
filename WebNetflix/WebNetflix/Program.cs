@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Text.Json.Serialization; // <-- для ReferenceHandler
 using WebNetflix.Data;
 using WebNetflix.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Security.Claims;
-using System.IdentityModel.Tokens.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +32,15 @@ builder.Services.AddCors(options =>
         });
 });
 
+// Controllers + JSON Options для циклів
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve; // <-- ключове
+        options.JsonSerializerOptions.MaxDepth = 64; // можна більше, якщо треба
+        options.JsonSerializerOptions.WriteIndented = true; // зручно для дебагу
+    });
+
 // JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -45,11 +54,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
-            NameClaimType = "email", // <-- сюди точно вказати назву claim з токена
+            NameClaimType = "email",
             RoleClaimType = ClaimTypes.Role
         };
 
-        // Логування проблем з токеном
         options.Events = new JwtBearerEvents
         {
             OnAuthenticationFailed = context =>
@@ -73,10 +81,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-
 builder.Services.AddAuthorization();
-
-builder.Services.AddControllers();
 
 // Swagger + Bearer кнопка
 builder.Services.AddEndpointsApiExplorer();
@@ -105,7 +110,7 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseCors("AllowFrontend"); // ✅ додали
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();

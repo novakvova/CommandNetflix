@@ -51,6 +51,28 @@ namespace WebNetflix.Data
                         j.ToTable("TrailerGenres");
                     });
 
+            // багато-до-багатьох User <-> Favorite Trailers
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.FavoriteTrailers)
+                .WithMany(t => t.FavoritedByUsers)
+                .UsingEntity<Dictionary<string, object>>(
+                    "UserFavoriteTrailer",
+                    j => j
+                        .HasOne<Trailer>()
+                        .WithMany()
+                        .HasForeignKey("TrailerId")
+                        .OnDelete(DeleteBehavior.Cascade),
+                    j => j
+                        .HasOne<User>()
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade),
+                    j =>
+                    {
+                        j.HasKey("UserId", "TrailerId");
+                        j.ToTable("UserFavoriteTrailers");
+                    });
+
             base.OnModelCreating(modelBuilder);
         }
     }
