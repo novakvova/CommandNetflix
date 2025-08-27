@@ -44,6 +44,12 @@ useEffect(() => {
           img: t.imageUrl,
           description: t.description || "Немає опису",
           youTubeCode: t.youTubeCode || "",
+          // Безпечне перетворення rating в number. Підстав 0, якщо поле відсутнє або некоректне
+          rating: (() => {
+            if (t.rating === undefined || t.rating === null) return 0;
+            const n = Number(t.rating);
+            return Number.isNaN(n) ? 0 : n;
+          })(),
         }))
       );
     })
