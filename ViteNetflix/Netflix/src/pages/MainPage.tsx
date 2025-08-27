@@ -28,23 +28,29 @@ export default function MainPage() {
     navigate("/");
   };
 
-  useEffect(() => {
-    fetch(API_URL)
-      .then((res) => res.json())
-      .then((data) =>
-        setMovies(
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          data.map((t: any) => ({
-            title: t.title,
-            img: t.imageUrl,
-            description: t.description || "Немає опису",
-            youTubeCode: t.youTubeCode || "", // ключ YouTube
-          }))
-        )
-      )
-      .catch((err) => console.error(err))
-      .finally(() => setLoading(false));
-  }, []);
+useEffect(() => {
+  fetch(API_URL)
+    .then((res) => res.json())
+    .then((data) => {
+      const trailers = Array.isArray(data)
+        ? data
+        : Array.isArray(data.$values)
+        ? data.$values
+        : [];
+
+      setMovies(
+        trailers.map((t: any) => ({
+          title: t.title,
+          img: t.imageUrl,
+          description: t.description || "Немає опису",
+          youTubeCode: t.youTubeCode || "",
+        }))
+      );
+    })
+    .catch((err) => console.error(err))
+    .finally(() => setLoading(false));
+}, []);
+
 
   const contentRef = useRef<HTMLDivElement>(null);
 
