@@ -56,16 +56,23 @@ export default function SearchPage() {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
       })
-      .then((data: any[]) => {
-        setMovies(
-          (data || []).map((t: any) => ({
-            title: t.title,
-            img: t.imageUrl,
-            description: t.description || "Немає опису",
-            youTubeCode: t.youTubeCode || "",
-          }))
-        );
-      })
+    .then((data) => {
+      const trailers = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.$values)
+        ? data.$values
+        : [];
+
+      setMovies(
+        trailers.map((t: any) => ({
+          title: t.title,
+          img: t.imageUrl,
+          description: t.description || "Немає опису",
+          youTubeCode: t.youTubeCode || "",
+        }))
+      );
+    })
+
       .catch((err) => {
         if ((err as any).name !== "AbortError") {
           console.error("[SearchPage] fetch error:", err);
