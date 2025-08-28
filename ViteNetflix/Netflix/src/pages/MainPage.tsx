@@ -28,35 +28,33 @@ export default function MainPage() {
     navigate("/");
   };
 
-useEffect(() => {
-  fetch(API_URL)
-    .then((res) => res.json())
-    .then((data) => {
-      const trailers = Array.isArray(data)
-        ? data
-        : Array.isArray(data.$values)
-        ? data.$values
-        : [];
+  useEffect(() => {
+    fetch(API_URL)
+      .then((res) => res.json())
+      .then((data) => {
+        const trailers = Array.isArray(data)
+          ? data
+          : Array.isArray(data.$values)
+          ? data.$values
+          : [];
 
-      setMovies(
-        trailers.map((t: any) => ({
-          title: t.title,
-          img: t.imageUrl,
-          description: t.description || "Немає опису",
-          youTubeCode: t.youTubeCode || "",
-          // Безпечне перетворення rating в number. Підстав 0, якщо поле відсутнє або некоректне
-          rating: (() => {
-            if (t.rating === undefined || t.rating === null) return 0;
-            const n = Number(t.rating);
-            return Number.isNaN(n) ? 0 : n;
-          })(),
-        }))
-      );
-    })
-    .catch((err) => console.error(err))
-    .finally(() => setLoading(false));
-}, []);
-
+        setMovies(
+          trailers.map((t: any) => ({
+            title: t.title,
+            img: t.imageUrl,
+            description: t.description || "Немає опису",
+            youTubeCode: t.youTubeCode || "",
+            rating: (() => {
+              if (t.rating === undefined || t.rating === null) return 0;
+              const n = Number(t.rating);
+              return Number.isNaN(n) ? 0 : n;
+            })(),
+          }))
+        );
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
+  }, []);
 
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -102,6 +100,7 @@ useEffect(() => {
                   description={selectedMovie.description ?? ""}
                   youTubeCode={selectedMovie.youTubeCode ?? ""}
                   onPlayTrailer={handlePlayTrailer}
+                  rating={selectedMovie.rating}
                 />
 
                 {youTubeCode && (
