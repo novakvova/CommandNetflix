@@ -75,11 +75,11 @@ export default function ImageList({ images, onMovieClick }: ImageListProps) {
             onClick={() => onMovieClick(movie)}
           >
             <img src={movie.img} alt={movie.title} />
-            {/* Рейтинг у верхньому правому кутку */}
+
             {movie.rating !== undefined && (
               <span className="rating">⭐ {movie.rating.toFixed(1)}</span>
             )}
-            {/* Назва внизу */}
+
             <p>{movie.title}</p>
           </div>
         ))}

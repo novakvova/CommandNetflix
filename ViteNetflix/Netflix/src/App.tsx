@@ -4,6 +4,7 @@ import { useAuth, AuthProvider } from "./AuthContext";
 import StartPage from "./pages/StartPage";
 import MainPage from "./pages/MainPage";
 import SearchPage from "./pages/SearchPage";
+import ResetPasswordPage from "./pages/ResetPassword";
 
 function AppRoutes() {
   const { isLoggedIn } = useAuth();
@@ -19,6 +20,7 @@ function AppRoutes() {
       ) : (
         <>
           <Route path="/" element={<StartPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="*" element={<Navigate to="/" />} />
         </>
       )}
