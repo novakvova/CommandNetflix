@@ -122,9 +122,42 @@ export default function LoginForm({ onShowRegister }: LoginFormProps) {
           ))}
         </div>
       )}
-      <div className="forgot-password">
-        <a href="/forgot-password">Забули пароль?</a>
-      </div>
+<div className="forgot-password">
+  <a
+    href="#"
+    onClick={async (e) => {
+      e.preventDefault();
+      const email = getValues("email"); // беремо email прямо з інпута
+      if (!email) {
+        alert("Введіть email перед відновленням пароля");
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          "http://localhost:5045/api/Auth/request-password-reset",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email }),
+          }
+        );
+
+        if (response.ok) {
+          alert("Посилання для відновлення пароля надіслано на пошту");
+        } else {
+          const err = await response.json();
+          alert("Помилка: " + (err.message || "невідома"));
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Помилка з'єднання з сервером");
+      }
+    }}
+  >
+    Забули пароль?
+  </a>
+</div>
 
       <Button
         type="submit"

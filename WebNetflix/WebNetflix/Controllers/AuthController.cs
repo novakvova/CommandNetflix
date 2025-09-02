@@ -118,31 +118,28 @@ namespace WebNetflix.Controllers
             });
         }
 
-
-
-
-
-
         // POST: /api/auth/request-password-reset
         [HttpPost("request-password-reset")]
         public async Task<IActionResult> RequestPasswordReset([FromBody] RequestPasswordResetDto dto)
         {
-            if (!ModelState.IsValid) return ValidationProblem(ModelState);
+            if (!ModelState.IsValid)
+                return ValidationProblem(ModelState);
 
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
             if (user == null)
             {
                 _logger.LogWarning("Password reset requested for non-existing email {Email}", dto.Email);
-                return Ok(); // не видаємо
+                return Ok();
             }
 
             var token = Guid.NewGuid().ToString();
-            var resetLink = $"http://localhost:5045/swagger/index.html";
+
+            var resetLink = $"http://localhost:5173/reset-password?token={Uri.EscapeDataString(token)}&email={Uri.EscapeDataString(user.Email)}";
 
             await _emailService.SendEmailAsync(
                 user.Email,
-                "Password Reset",
-                $"Click <a href='{resetLink}'>here</a> to reset your password."
+                "Скидання пароля",
+                $"Натисніть <a href='{resetLink}'>сюди</a>, щоб скинути пароль. Посилання дійсне 1 годину."
             );
 
             user.PasswordResetToken = token;
@@ -152,6 +149,8 @@ namespace WebNetflix.Controllers
             _logger.LogInformation("Password reset requested for {Email}", user.Email);
             return Ok();
         }
+
+
 
         // POST: /api/auth/reset-password
         [HttpPost("reset-password")]
