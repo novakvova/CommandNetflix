@@ -72,6 +72,7 @@
   margin-top: 50px !important;
 }
 .Dropdown .p-dropdown {
+  margin-left: 20px;
   height: 44px !important;
   background-color: #000000 !important; /* фон */
   border: 1px solid #ffffff !important; /* обводка */
