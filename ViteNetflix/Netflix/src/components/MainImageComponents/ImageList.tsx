@@ -17,6 +17,26 @@ interface ImageListProps {
 
 export default function ImageList({ images, onMovieClick }: ImageListProps) {
   const [sortOption, setSortOption] = useState<string | null>(null);
+  const [genre, setGenre] = useState<string | null>(null);
+
+  const genres = [
+    {
+      label: "Усі жанри",
+      value: null,
+    },
+    {
+      label: "Комедія",
+      value: "comedy",
+    },
+    {
+      label: "Драма",
+      value: "drama",
+    },
+    {
+      label: "Екшн",
+      value: "action",
+    },
+  ];
 
   const sortOptions = [
     { label: "За назвою (А → Я)", value: "titleAsc" },
@@ -63,6 +83,15 @@ export default function ImageList({ images, onMovieClick }: ImageListProps) {
           options={sortOptions}
           optionLabel="label"
           placeholder="Сортувати фільми"
+          className="w-full md:w-14rem"
+        />
+
+        <Dropdown
+          value={genre}
+          onChange={(e: any) => setGenre(e.value)}
+          options={genres}
+          optionLabel="label"
+          placeholder="Сортувати по жанрам"
           className="w-full md:w-14rem"
         />
       </div>
