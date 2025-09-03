@@ -27,12 +27,14 @@
 
 /* ===== Підсвітка тільки для search і home ===== */
 .icon.search,
-.icon.home {
+.icon.home,
+.icon.bookmark {
   position: relative;
 }
 
 .icon.search::after,
-.icon.home::after {
+.icon.home::after,
+.icon.bookmark::after {
   content: "";
   position: absolute;
   bottom: -5px;
@@ -44,7 +46,8 @@
 }
 
 .icon.search:hover::after,
-.icon.home:hover::after {
+.icon.home:hover::after,
+.icon.bookmark:hover::after {
   width: 100%;
 }
 

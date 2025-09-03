@@ -15,6 +15,7 @@ function AppRoutes() {
         <>
           <Route path="/home" element={<MainPage />} />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/bookmark" element={<MainPage />} />
           <Route path="*" element={<Navigate to="/home" />} />
         </>
       ) : (

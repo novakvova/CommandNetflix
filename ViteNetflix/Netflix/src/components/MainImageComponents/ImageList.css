@@ -105,3 +105,16 @@
   border-radius: 3px;
   font-size: 12px;
 }
+.bookmark-icon {
+  width: 24px !important;
+  height: 24px !important;
+  cursor: pointer;
+  position: absolute;
+  top: 30px;
+  right: 10px;
+  z-index: 2;
+}
+
+.image-item {
+  position: relative;
+}

@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import searchIcon from "../../assets/search.png";
 import homeIcon from "../../assets/home.png";
+import bookmarkIcon from "../../assets/bookmark.png";
 import React, { useState } from "react";
 import type { ChangeEvent } from "react";
 import "../../pages/MainPage.css";
@@ -17,17 +18,18 @@ export default function HeaderAndRightPanel({ children, onSearch }: Props) {
     const v = e.target.value;
     setValue(v);
     if (onSearch) {
-      onSearch(v); // миттєво передаємо — debounce робимо на MainPage
+      onSearch(v);
     }
   };
 
   return (
     <>
-      {/* Sidebar */}
       <div className="sidebar">
         <NavLink
           to="/search"
-          className={({ isActive }) => `icon search ${isActive ? "active" : ""}`}
+          className={({ isActive }) =>
+            `icon search ${isActive ? "active" : ""}`
+          }
         >
           <img src={searchIcon} alt="Search" />
         </NavLink>
@@ -37,11 +39,17 @@ export default function HeaderAndRightPanel({ children, onSearch }: Props) {
         >
           <img src={homeIcon} alt="Home" />
         </NavLink>
+        <NavLink
+          to="/bookmark"
+          className={({ isActive }) =>
+            `icon bookmark ${isActive ? "active" : ""}`
+          }
+        >
+          <img src={bookmarkIcon} alt="Bookmark" />
+        </NavLink>
       </div>
 
-      {/* Topbar */}
       <div className="topbar">
-        {/* Пошуковий інпут */}
         {onSearch && (
           <input
             className="header-search-input"

@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
 import "./ImageList.css";
 import { Dropdown } from "primereact/dropdown";
+import bookmarkDefault from "../../assets/bookmarkDefault.png";
+import bookmarkActive from "../../assets/bookmarkActive.png";
 
 export interface Movie {
   title: string;
@@ -19,23 +21,21 @@ export default function ImageList({ images, onMovieClick }: ImageListProps) {
   const [sortOption, setSortOption] = useState<string | null>(null);
   const [genre, setGenre] = useState<string | null>(null);
 
+  // закладки
+  const [bookmarks, setBookmarks] = useState<{ [key: string]: boolean }>({});
+
+  const toggleBookmark = (title: string) => {
+    setBookmarks((prev) => ({
+      ...prev,
+      [title]: !prev[title],
+    }));
+  };
+
   const genres = [
-    {
-      label: "Усі жанри",
-      value: null,
-    },
-    {
-      label: "Комедія",
-      value: "comedy",
-    },
-    {
-      label: "Драма",
-      value: "drama",
-    },
-    {
-      label: "Екшн",
-      value: "action",
-    },
+    { label: "Усі жанри", value: null },
+    { label: "Комедія", value: "comedy" },
+    { label: "Драма", value: "drama" },
+    { label: "Екшн", value: "action" },
   ];
 
   const sortOptions = [
@@ -97,9 +97,9 @@ export default function ImageList({ images, onMovieClick }: ImageListProps) {
       </div>
 
       <div className="image-list">
-        {sortedMovies.map((movie, index) => (
+        {sortedMovies.map((movie) => (
           <div
-            key={index}
+            key={movie.title}
             className="image-item"
             onClick={() => onMovieClick(movie)}
           >
@@ -108,6 +108,16 @@ export default function ImageList({ images, onMovieClick }: ImageListProps) {
             {movie.rating !== undefined && (
               <span className="rating">⭐ {movie.rating.toFixed(1)}</span>
             )}
+
+            <img
+              src={bookmarks[movie.title] ? bookmarkActive : bookmarkDefault}
+              alt="bookmark"
+              className="bookmark-icon"
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleBookmark(movie.title);
+              }}
+            />
 
             <p>{movie.title}</p>
           </div>
