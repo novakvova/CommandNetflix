@@ -3,74 +3,72 @@ import "./MainPage.css";
 
 import userIcon from "../assets/Group.png";
 import HeaderAndRightPanel from "../components/HeaderAndRightPanel/HeaderAndRightPanel";
-import ImageList, {
-  type Movie,
-} from "../components/MainImageComponents/ImageList";
+import ImageList, { type Movie } from "../components/MainImageComponents/ImageList";
 import { useAuth } from "../AuthContext";
 import { useEffect, useRef, useState } from "react";
 import LoadingSpinner from "../components/LoadingSpinner/LoadingSpinner";
 import Banner from "../components/Banner/Banner";
 import TrailerModal from "../components/TrailerModal/TrailerModal";
 
-const API_URL = "http://localhost:5045/api/trailers";
-
-export default function MainPage() {
+export default function SavedMoviesPage() {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
 
-  const [movies, setMovies] = useState<Movie[]>([]);
+  const [savedMovies, setSavedMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [youTubeCode, setYouTubeCode] = useState<string | null>(null);
+
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const handleLogout = () => {
     logout();
     navigate("/");
   };
 
-  useEffect(() => {
-    fetch(API_URL)
-      .then((res) => res.json())
-      .then((data) => {
-        const trailers = Array.isArray(data)
-          ? data
-          : Array.isArray(data.$values)
-          ? data.$values
-          : [];
+useEffect(() => {
+  if (!user) return;
 
-        setMovies(
-          trailers.map((t: any) => ({
-            title: t.title,
-            img: t.imageUrl,
-            description: t.description || "Немає опису",
-            youTubeCode: t.youTubeCode || "",
-            rating: (() => {
-              if (t.rating === undefined || t.rating === null) return 0;
-              const n = Number(t.rating);
-              return Number.isNaN(n) ? 0 : n;
-            })(),
-          }))
-        );
-      })
-      .catch((err) => console.error(err))
-      .finally(() => setLoading(false));
-  }, []);
+  fetch(`http://localhost:5045/api/FavoriteTrailers/${user.id}`)
+    .then(res => res.json())
+    .then(data => {
+      const moviesArray = data.$values ?? [];
 
-  const contentRef = useRef<HTMLDivElement>(null);
+      const favMovies: Movie[] = moviesArray.map((t: any, index: number) => {
+        const genres: { id: number; name: string }[] =
+          t.genres?.$values?.map((g: any) => ({
+            id: g.id,
+            name: g.name
+          })) ?? [];
+
+        return {
+          id: t.id ?? `movie-${index}`,
+          title: t.title ?? "Без назви",
+          img: t.imageUrl ?? "",
+          description: t.description ?? "Немає опису",
+          youTubeCode: t.youTubeCode ?? "",
+          rating: t.rating ?? 0,
+          genres: genres,
+          genreIds: genres.map(g => g.id)
+        };
+      });
+
+      setSavedMovies(favMovies);
+    })
+    .catch(err => console.error("Error fetching favorites:", err))
+    .finally(() => setLoading(false));
+}, [user]);
+
+
 
   const handleMovieClick = (movie: Movie) => {
     setSelectedMovie(movie);
     setYouTubeCode(null);
-    if (contentRef.current) {
-      contentRef.current.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
-    }
+    contentRef.current?.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handlePlayTrailer = () => {
-    if (selectedMovie && selectedMovie.youTubeCode) {
+    if (selectedMovie?.youTubeCode) {
       setYouTubeCode(selectedMovie.youTubeCode);
     } else {
       alert("Немає трейлера для цього фільму");
@@ -111,8 +109,11 @@ export default function MainPage() {
                 )}
               </>
             )}
-            {/* це замінимо на масив тих що лайкнуті */}
-            <ImageList images={movies} onMovieClick={handleMovieClick} />
+
+            <ImageList
+              images={savedMovies}
+              onMovieClick={handleMovieClick}
+            />
           </>
         )}
       </div>

@@ -32,7 +32,6 @@ useEffect(() => {
   fetch(API_URL)
     .then((res) => res.json())
     .then((data) => {
-      console.log("📥 Сирі дані з API:", data);
 
       const trailers = Array.isArray(data)
         ? data
@@ -44,6 +43,7 @@ const mappedMovies = trailers.map((t: any) => {
   const genresArray = Array.isArray(t.genres?.$values) ? t.genres.$values : [];
 
   return {
+    id: t.id, // <-- додано
     title: t.title,
     img: t.imageUrl,
     description: t.description || "Немає опису",
@@ -59,7 +59,6 @@ const mappedMovies = trailers.map((t: any) => {
 });
 
 
-      console.log("✅ Мапнуті трейлери:", mappedMovies);
 
       setMovies(mappedMovies);
     })

@@ -18,7 +18,7 @@ namespace WebNetflix.Controllers
 
         // GET: api/FavoriteTrailers/5
         [HttpGet("{userId}")]
-        public async Task<ActionResult<IEnumerable<Trailer>>> GetFavoriteTrailers(int userId)
+        public async Task<ActionResult<IEnumerable<TrailerDto>>> GetFavoriteTrailers(int userId)
         {
             var user = await _context.Users
                 .Include(u => u.FavoriteTrailers)
@@ -28,8 +28,20 @@ namespace WebNetflix.Controllers
             if (user == null)
                 return NotFound("Користувача не знайдено");
 
-            return Ok(user.FavoriteTrailers);
+            var trailersDto = user.FavoriteTrailers.Select(t => new TrailerDto
+            {
+                Id = t.Id,
+                Title = t.Title,
+                ImageUrl = t.ImageUrl,
+                YouTubeCode = t.YouTubeCode,
+                Rating = t.Rating,
+                Description = t.Description,
+                Genres = t.Genres.Select(g => new GenreDto { Id = g.Id, Name = g.Name }).ToList()
+            }).ToList();
+
+            return Ok(trailersDto);
         }
+
 
         // POST: api/FavoriteTrailers/5/10
         [HttpPost("{userId}/{trailerId}")]

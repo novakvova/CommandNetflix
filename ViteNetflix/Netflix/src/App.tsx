@@ -4,6 +4,7 @@ import { useAuth, AuthProvider } from "./AuthContext";
 import StartPage from "./pages/StartPage";
 import MainPage from "./pages/MainPage";
 import SearchPage from "./pages/SearchPage";
+import BookmarkPage from "./pages/BookmarkPage"
 import ResetPasswordPage from "./pages/ResetPassword";
 
 function AppRoutes() {
@@ -15,7 +16,7 @@ function AppRoutes() {
         <>
           <Route path="/home" element={<MainPage />} />
           <Route path="/search" element={<SearchPage />} />
-          <Route path="/bookmark" element={<MainPage />} />
+          <Route path="/bookmark" element={<BookmarkPage />} />
           <Route path="*" element={<Navigate to="/home" />} />
         </>
       ) : (
