@@ -107,7 +107,7 @@
 }
 .bookmark-icon {
   width: 24px !important;
-  height: 24px !important;
+  height: auto !important;
   cursor: pointer;
   position: absolute;
   top: 30px;
@@ -117,4 +117,12 @@
 
 .image-item {
   position: relative;
+}
+
+.genres {
+  position: absolute;
+  bottom: 20px;
+  right: 10px;
+  font-weight: 800;
+  color: #ffffff;
 }

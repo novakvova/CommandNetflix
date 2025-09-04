@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import searchIcon from "../../assets/search.png";
 import homeIcon from "../../assets/home.png";
-import bookmarkIcon from "../../assets/bookmark.png";
+import bookmarkDefault from "../../assets/bookmarkDefault.png";
 import React, { useState } from "react";
 import type { ChangeEvent } from "react";
 import "../../pages/MainPage.css";
@@ -45,7 +45,7 @@ export default function HeaderAndRightPanel({ children, onSearch }: Props) {
             `icon bookmark ${isActive ? "active" : ""}`
           }
         >
-          <img src={bookmarkIcon} alt="Bookmark" />
+          <img src={bookmarkDefault} alt="Bookmark" />
         </NavLink>
       </div>
 
