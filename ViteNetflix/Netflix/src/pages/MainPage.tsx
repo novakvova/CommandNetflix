@@ -28,33 +28,46 @@ export default function MainPage() {
     navigate("/");
   };
 
-  useEffect(() => {
-    fetch(API_URL)
-      .then((res) => res.json())
-      .then((data) => {
-        const trailers = Array.isArray(data)
-          ? data
-          : Array.isArray(data.$values)
-          ? data.$values
-          : [];
+useEffect(() => {
+  fetch(API_URL)
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("📥 Сирі дані з API:", data);
 
-        setMovies(
-          trailers.map((t: any) => ({
-            title: t.title,
-            img: t.imageUrl,
-            description: t.description || "Немає опису",
-            youTubeCode: t.youTubeCode || "",
-            rating: (() => {
-              if (t.rating === undefined || t.rating === null) return 0;
-              const n = Number(t.rating);
-              return Number.isNaN(n) ? 0 : n;
-            })(),
-          }))
-        );
-      })
-      .catch((err) => console.error(err))
-      .finally(() => setLoading(false));
-  }, []);
+      const trailers = Array.isArray(data)
+        ? data
+        : Array.isArray(data.$values)
+        ? data.$values
+        : [];
+
+const mappedMovies = trailers.map((t: any) => {
+  const genresArray = Array.isArray(t.genres?.$values) ? t.genres.$values : [];
+
+  return {
+    title: t.title,
+    img: t.imageUrl,
+    description: t.description || "Немає опису",
+    youTubeCode: t.youTubeCode || "",
+    rating: (() => {
+      if (t.rating === undefined || t.rating === null) return 0;
+      const n = Number(t.rating);
+      return Number.isNaN(n) ? 0 : n;
+    })(),
+    genreIds: genresArray.map((g: any) => g.id),
+    genres: genresArray.map((g: any) => ({ id: g.id, name: g.name })),
+  };
+});
+
+
+      console.log("✅ Мапнуті трейлери:", mappedMovies);
+
+      setMovies(mappedMovies);
+    })
+    .catch((err) => console.error("❌ Помилка завантаження трейлерів:", err))
+    .finally(() => setLoading(false));
+}, []);
+
+
 
   const contentRef = useRef<HTMLDivElement>(null);
 
