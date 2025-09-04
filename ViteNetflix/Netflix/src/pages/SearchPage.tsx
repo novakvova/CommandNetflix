@@ -63,20 +63,21 @@ export default function SearchPage() {
         ? data.$values
         : [];
 
-      setMovies(
-        trailers.map((t: any) => ({
-          title: t.title,
-          img: t.imageUrl,
-          description: t.description || "Немає опису",
-          youTubeCode: t.youTubeCode || "",
-          // Безпечне перетворення rating в number. Підстав 0, якщо поле відсутнє або некоректне
-          rating: (() => {
-            if (t.rating === undefined || t.rating === null) return 0;
-            const n = Number(t.rating);
-            return Number.isNaN(n) ? 0 : n;
-          })(),
-        }))
-      );
+setMovies(
+  trailers.map((t: any) => ({
+    title: t.title,
+    img: t.imageUrl,
+    description: t.description || "Немає опису",
+    youTubeCode: t.youTubeCode || "",
+    rating: (() => {
+      if (t.rating === undefined || t.rating === null) return 0;
+      const n = Number(t.rating);
+      return Number.isNaN(n) ? 0 : n;
+    })(),
+    genres: t.genres?.$values ?? [],               // масив жанрів {id, name}
+    genreIds: t.genres?.$values?.map((g: any) => g.id) ?? [], // масив id
+  }))
+);
     })
 
       .catch((err) => {

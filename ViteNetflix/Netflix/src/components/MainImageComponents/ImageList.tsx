@@ -1,8 +1,12 @@
+// ImageList.tsx
 import { useState, useMemo } from "react";
 import "./ImageList.css";
 import { Dropdown } from "primereact/dropdown";
-import bookmarkDefault from "../../assets/bookmarkDefault.png";
-import bookmarkActive from "../../assets/bookmarkActive.png";
+
+export interface Genre {
+  id: number;
+  name: string;
+}
 
 export interface Movie {
   title: string;
@@ -10,6 +14,8 @@ export interface Movie {
   description?: string;
   youTubeCode?: string;
   rating?: number;
+  genres?: Genre[];
+  genreIds?: number[];
 }
 
 interface ImageListProps {
@@ -19,34 +25,34 @@ interface ImageListProps {
 
 export default function ImageList({ images, onMovieClick }: ImageListProps) {
   const [sortOption, setSortOption] = useState<string | null>(null);
-  const [genre, setGenre] = useState<string | null>(null);
+  const [genre, setGenre] = useState<number | null>(null);
 
-  // закладки
-  const [bookmarks, setBookmarks] = useState<{ [key: string]: boolean }>({});
+  // Генеруємо список жанрів із переданих фільмів
+  const genres = useMemo(() => {
+    const allGenres: { [key: number]: string } = {};
+    images.forEach((m) => {
+      m.genres?.forEach((g) => {
+        allGenres[g.id] = g.name;
+      });
+    });
+    return [
+      { label: "Усі жанри", value: null },
+      ...Object.entries(allGenres).map(([id, name]) => ({
+        label: name,
+        value: Number(id),
+      })),
+    ];
+  }, [images]);
 
-  const toggleBookmark = (title: string) => {
-    setBookmarks((prev) => ({
-      ...prev,
-      [title]: !prev[title],
-    }));
-  };
+  // Фільтрація за жанрами
+  const filteredMovies = useMemo(() => {
+    if (!genre) return images;
+    return images.filter((m) => m.genreIds?.includes(genre));
+  }, [images, genre]);
 
-  const genres = [
-    { label: "Усі жанри", value: null },
-    { label: "Комедія", value: "comedy" },
-    { label: "Драма", value: "drama" },
-    { label: "Екшн", value: "action" },
-  ];
-
-  const sortOptions = [
-    { label: "За назвою (А → Я)", value: "titleAsc" },
-    { label: "За назвою (Я → А)", value: "titleDesc" },
-    { label: "За рейтингом (високий → низький)", value: "ratingDesc" },
-    { label: "За рейтингом (низький → високий)", value: "ratingAsc" },
-  ];
-
+  // Сортування
   const sortedMovies = useMemo(() => {
-    const sorted = [...images];
+    const sorted = [...filteredMovies];
     const getRating = (m: Movie) => Number(m?.rating ?? 0);
 
     switch (sortOption) {
@@ -57,30 +63,28 @@ export default function ImageList({ images, onMovieClick }: ImageListProps) {
         sorted.sort((a, b) => b.title.localeCompare(a.title));
         break;
       case "ratingAsc":
-        sorted.sort((a, b) => {
-          const diff = getRating(a) - getRating(b);
-          return diff !== 0 ? diff : a.title.localeCompare(b.title);
-        });
+        sorted.sort((a, b) => getRating(a) - getRating(b));
         break;
       case "ratingDesc":
-        sorted.sort((a, b) => {
-          const diff = getRating(b) - getRating(a);
-          return diff !== 0 ? diff : a.title.localeCompare(b.title);
-        });
-        break;
-      default:
+        sorted.sort((a, b) => getRating(b) - getRating(a));
         break;
     }
+
     return sorted;
-  }, [images, sortOption]);
+  }, [filteredMovies, sortOption]);
 
   return (
     <>
       <div className="card flex justify-content-center Dropdown">
         <Dropdown
           value={sortOption}
-          onChange={(e: any) => setSortOption(e.value)}
-          options={sortOptions}
+          onChange={(e: { value: string | null }) => setSortOption(e.value)}
+          options={[
+            { label: "За назвою (А → Я)", value: "titleAsc" },
+            { label: "За назвою (Я → А)", value: "titleDesc" },
+            { label: "За рейтингом (високий → низький)", value: "ratingDesc" },
+            { label: "За рейтингом (низький → високий)", value: "ratingAsc" },
+          ]}
           optionLabel="label"
           placeholder="Сортувати фільми"
           className="w-full md:w-14rem"
@@ -88,38 +92,30 @@ export default function ImageList({ images, onMovieClick }: ImageListProps) {
 
         <Dropdown
           value={genre}
-          onChange={(e: any) => setGenre(e.value)}
+          onChange={(e: { value: number | null }) => setGenre(e.value)}
           options={genres}
           optionLabel="label"
-          placeholder="Сортувати по жанрам"
+          optionValue="value"
+          placeholder="Фільтрувати по жанрах"
           className="w-full md:w-14rem"
         />
       </div>
 
       <div className="image-list">
-        {sortedMovies.map((movie) => (
+        {sortedMovies.map((movie, index) => (
           <div
-            key={movie.title}
+            key={index}
             className="image-item"
             onClick={() => onMovieClick(movie)}
           >
             <img src={movie.img} alt={movie.title} />
-
             {movie.rating !== undefined && (
               <span className="rating">⭐ {movie.rating.toFixed(1)}</span>
             )}
-
-            <img
-              src={bookmarks[movie.title] ? bookmarkActive : bookmarkDefault}
-              alt="bookmark"
-              className="bookmark-icon"
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleBookmark(movie.title);
-              }}
-            />
-
             <p>{movie.title}</p>
+            <small>
+              Жанри: {movie.genres?.map((g) => g.name).join(", ") || "немає"}
+            </small>
           </div>
         ))}
       </div>
