@@ -3,6 +3,7 @@ import "./ImageList.css";
 import { Dropdown } from "primereact/dropdown";
 import bookmarkDefault from "../../assets/bookmarkDefault.png";
 import bookmarkActive from "../../assets/bookmarkActive.png";
+import { useAuth } from "../../AuthContext";
 
 export interface Genre {
   id: number;
@@ -10,6 +11,7 @@ export interface Genre {
 }
 
 export interface Movie {
+  id: number; // <-- додано
   title: string;
   img: string;
   description?: string;
@@ -19,37 +21,90 @@ export interface Movie {
   genreIds?: number[];
 }
 
+
 interface ImageListProps {
-  images: Movie[];
+  images: any; // сирі дані з API
   onMovieClick: (movie: Movie) => void;
 }
 
 export default function ImageList({ images, onMovieClick }: ImageListProps) {
   const [sortOption, setSortOption] = useState<string | null>(null);
   const [genre, setGenre] = useState<number | null>(null);
+  const { user } = useAuth();
 
   // bookmarks у localStorage
   const [bookmarks, setBookmarks] = useState<{ [key: string]: boolean }>({});
+  const userBookmarksKey = `bookmarks_user_${user?.id}`;
 
-  useEffect(() => {
-    const saved = localStorage.getItem("bookmarks");
-    if (saved) {
-      setBookmarks(JSON.parse(saved));
-    }
-  }, []);
+useEffect(() => {
+  if (!user) return;
+  const saved = localStorage.getItem(userBookmarksKey);
+  if (saved) {
+    setBookmarks(JSON.parse(saved));
+  } else {
+    setBookmarks({});
+  }
+}, [user]);
 
-  const toggleBookmark = (title: string) => {
-    setBookmarks((prev) => {
-      const updated = { ...prev, [title]: !prev[title] };
-      localStorage.setItem("bookmarks", JSON.stringify(updated));
-      return updated;
-    });
-  };
+const toggleBookmark = async (movie: Movie) => {
+  const userId = user?.id;
+  if (!userId) {
+    alert("Користувач не авторизований");
+    return;
+  }
+
+  const key = movie.title;
+  const isBookmarked = !!bookmarks[key];
+
+  // оновлюємо UI
+  setBookmarks((prev) => {
+    const newBookmarks = { ...prev, [key]: !isBookmarked };
+    localStorage.setItem(userBookmarksKey, JSON.stringify(newBookmarks)); // <-- динамічний ключ
+    return newBookmarks;
+  });
+
+  try {
+    const url = `http://localhost:5045/api/FavoriteTrailers/${userId}/${movie.id}`;
+    const method = isBookmarked ? "DELETE" : "POST";
+    const res = await fetch(url, { method });
+
+    if (!res.ok) throw new Error("Помилка при оновленні улюблених на сервері");
+
+    console.log(
+      !isBookmarked
+        ? `Фільм "${movie.title}" додано в улюблені (API)`
+        : `Фільм "${movie.title}" видалено з улюблених (API)`
+    );
+  } catch (err) {
+    console.error(err);
+    // якщо помилка — повертаємо попередній стан
+    setBookmarks((prev) => ({ ...prev, [key]: isBookmarked }));
+    localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
+  }
+};
+
+
+
+const formattedMovies: Movie[] = useMemo(() => {
+  if (!images) return [];
+  return images.map((m: any) => ({
+    id: m.id ?? `movie-${m.title ?? Math.random()}`, // гарантовано унікальний id
+    title: m.title ?? "Без назви",
+    img: m.img ?? "",
+    rating: m.rating ?? 0,
+    description: m.description ?? "Немає опису",
+    youTubeCode: m.youTubeCode ?? "",
+    genres: m.genres ?? [],
+    genreIds: m.genreIds ?? [],
+  }));
+}, [images]);
+
+
 
   // Генеруємо список жанрів із переданих фільмів
   const genres = useMemo(() => {
     const allGenres: { [key: number]: string } = {};
-    images.forEach((m) => {
+    formattedMovies.forEach((m) => {
       m.genres?.forEach((g) => {
         allGenres[g.id] = g.name;
       });
@@ -66,7 +121,7 @@ export default function ImageList({ images, onMovieClick }: ImageListProps) {
   // Фільтрація за жанрами
   const filteredMovies = useMemo(() => {
     if (!genre) return images;
-    return images.filter((m) => m.genreIds?.includes(genre));
+    return formattedMovies.filter((m) => m.genreIds?.includes(genre));
   }, [images, genre]);
 
   // Сортування
@@ -129,7 +184,7 @@ export default function ImageList({ images, onMovieClick }: ImageListProps) {
       <div className="image-list">
         {sortedMovies.map((movie) => (
           <div
-            key={movie.title}
+            key={`${movie.id}-${movie.title}`}
             className="image-item"
             onClick={() => onMovieClick(movie)}
           >
@@ -138,20 +193,18 @@ export default function ImageList({ images, onMovieClick }: ImageListProps) {
               <span className="rating">⭐ {movie.rating.toFixed(1)}</span>
             )}
 
-            <img
-              src={bookmarks[movie.title] ? bookmarkActive : bookmarkDefault}
-              alt="bookmark"
-              className="bookmark-icon"
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleBookmark(movie.title);
-              }}
-            />
+          <img
+            src={bookmarks[movie.title] ? bookmarkActive : bookmarkDefault}
+            alt="bookmark"
+            className="bookmark-icon"
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleBookmark(movie);
+            }}
+          />
+
 
             <p>{movie.title}</p>
-            <small className="genres">
-              Жанри: {movie.genres?.map((g) => g.name).join(", ") || "немає"}
-            </small>
           </div>
         ))}
       </div>

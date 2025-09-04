@@ -60,20 +60,23 @@ export default function LoginForm({ onShowRegister }: LoginFormProps) {
       const token = result.token;
       console.log("Login success:", result);
 
-      login(token);
+      // login(token);
 
-      const meResponse = await fetch("http://localhost:5045/api/Auth/me", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+    const meResponse = await fetch("http://localhost:5045/api/Auth/me", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-      if (meResponse.ok) {
-        const user = await meResponse.json();
-        console.log("User info:", user);
+    if (meResponse.ok) {
+      const user = await meResponse.json(); // user має мати id та email
+      console.log("User info:", user);
 
-        navigate("/home");
-      } else {
-        alert("Токен недійсний або прострочений");
-      }
+      // Передаємо токен і користувача в контекст
+      login(token, user);
+
+      navigate("/home");
+    } else {
+      alert("Токен недійсний або прострочений");
+    }
     } catch (error) {
       console.error("Login error:", error);
       alert("Помилка з'єднання з сервером");
@@ -127,7 +130,7 @@ export default function LoginForm({ onShowRegister }: LoginFormProps) {
     href="#"
     onClick={async (e) => {
       e.preventDefault();
-      const email = getValues("email"); // беремо email прямо з інпута
+      const email = getValues("email");
       if (!email) {
         alert("Введіть email перед відновленням пароля");
         return;
