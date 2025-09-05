@@ -1,0 +1,31 @@
+version: "3.9"
+networks:
+  myAppNetwork:
+    driver: bridge
+
+services:
+  app:
+    container_name: netflix_container
+    image: novakvova/netflix-asp-api
+    ports:
+      - "5819:8080"  
+    networks:
+      - myAppNetwork
+    environment:
+      - DefaultConnection=Host=ep-icy-fire-abxn1631-pooler.eu-west-2.aws.neon.tech;Database=neondb;Username=neondb_owner;Password=npg_ZbsnMvS4O1Lq;SSL Mode=Require;Trust Server Certificate=true
+    volumes:
+      - /volumes/netflix-asp/backup:/app/backup 
+      - /volumes/netflix-asp/images:/app/uploading
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+
+  client:
+    container_name: netflix_client_container
+    image: novakvova/netflix-client
+    restart: on-failure
+    ports:
+      - "5099:80"  
+    networks:
+      - myAppNetwork

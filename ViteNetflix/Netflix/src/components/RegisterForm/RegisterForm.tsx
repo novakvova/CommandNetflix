@@ -50,7 +50,7 @@ export default function RegisterForm({ onShowLogin }: RegisterFormProps) {
 
   const onSubmit = async (data: RegisterFormFields) => {
     try {
-      const response = await fetch("http://localhost:5045/api/Auth/register", {
+      const response = await fetch("http://3.70.134.171:5819/api/Auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

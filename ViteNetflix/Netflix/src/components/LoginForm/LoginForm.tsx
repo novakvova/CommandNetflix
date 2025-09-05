@@ -44,7 +44,7 @@ export default function LoginForm({ onShowRegister }: LoginFormProps) {
 
   const onSubmit = async (data: LoginFormFields) => {
     try {
-      const response = await fetch("http://localhost:5045/api/Auth/login", {
+      const response = await fetch("http://3.70.134.171:5819/api/Auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -62,7 +62,7 @@ export default function LoginForm({ onShowRegister }: LoginFormProps) {
 
       // login(token);
 
-    const meResponse = await fetch("http://localhost:5045/api/Auth/me", {
+    const meResponse = await fetch("http://3.70.134.171:5819/api/Auth/me", {
       headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -138,7 +138,7 @@ export default function LoginForm({ onShowRegister }: LoginFormProps) {
 
       try {
         const response = await fetch(
-          "http://localhost:5045/api/Auth/request-password-reset",
+          "http://3.70.134.171:5819/api/Auth/request-password-reset",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

@@ -29,7 +29,7 @@ export default function SavedMoviesPage() {
 useEffect(() => {
   if (!user) return;
 
-  fetch(`http://localhost:5045/api/FavoriteTrailers/${user.id}`)
+  fetch(`http://3.70.134.171:5819/api/FavoriteTrailers/${user.id}`)
     .then(res => res.json())
     .then(data => {
       const moviesArray = data.$values ?? [];

@@ -72,23 +72,23 @@ namespace WebNetflix.Controllers
             if (!ModelState.IsValid) return ValidationProblem(ModelState);
 
             var email = dto.Email.Trim().ToLowerInvariant();
-            _logger.LogInformation("Login attempt for {Email}", email);
+            //_logger.LogInformation("Login attempt for {Email}", email);
 
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == email);
             if (user is null)
             {
-                _logger.LogWarning("Login failed: {Email} not found", email);
+                //_logger.LogWarning("Login failed: {Email} not found", email);
                 return Unauthorized("Invalid credentials");
             }
 
             if (!_passwords.VerifyPassword(user, dto.Password))
             {
-                _logger.LogWarning("Login failed: invalid password for {Email}", email);
+                //_logger.LogWarning("Login failed: invalid password for {Email}", email);
                 return Unauthorized("Invalid credentials");
             }
 
             var token = _jwt.GenerateToken(user);
-            _logger.LogInformation("User {Email} logged in successfully", email);
+            //_logger.LogInformation("User {Email} logged in successfully", email);
 
             return Ok(new { token });
         }

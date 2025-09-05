@@ -64,7 +64,7 @@ const toggleBookmark = async (movie: Movie) => {
   });
 
   try {
-    const url = `http://localhost:5045/api/FavoriteTrailers/${userId}/${movie.id}`;
+    const url = `http://3.70.134.171:5819/api/FavoriteTrailers/${userId}/${movie.id}`;
     const method = isBookmarked ? "DELETE" : "POST";
     const res = await fetch(url, { method });
 

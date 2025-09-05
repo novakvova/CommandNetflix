@@ -12,7 +12,7 @@ import LoadingSpinner from "../components/LoadingSpinner/LoadingSpinner";
 import Banner from "../components/Banner/Banner";
 import TrailerModal from "../components/TrailerModal/TrailerModal";
 
-const API_URL = "http://localhost:5045/api/trailers";
+const API_URL = "http://3.70.134.171:5819/api/trailers";
 
 export default function MainPage() {
   const navigate = useNavigate();
