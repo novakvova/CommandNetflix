@@ -2,6 +2,7 @@ import React from "react";
 import "./Banner.css";
 import playImg from "../../assets/play.png";
 import starRating from "../../assets/star.png";
+//@ts-ignore
 import { div } from "framer-motion/client";
 interface BannerProps {
   title: string;
